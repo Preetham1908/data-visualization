@@ -1,0 +1,190 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "toc_visible": true,
+      "authorship_tag": "ABX9TyNNOvbxYz4YditiMKn8WZkc",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Preetham1908/data-visualization/blob/main/web%20scraping%20.%20ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "Bbt6wruWoS2n"
+      },
+      "outputs": [],
+      "source": [
+        "import requests"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "Link=\"https://www.jagranjosh.com/general-knowledge/list-of-most-powerful-military-in-the-world-1705477042-1\"\n",
+        "Link_text=requests.get(Link).text\n",
+        "print(Link_text)"
+      ],
+      "metadata": {
+        "id": "ftfmSlPTvCaM"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from bs4 import BeautifulSoup\n",
+        "soup = BeautifulSoup(Link_text, 'lxml')\n",
+        "print(soup)"
+      ],
+      "metadata": {
+        "id": "O5Ps2cNkvLUp"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(soup.prettify())"
+      ],
+      "metadata": {
+        "id": "0sekqbR4vVrD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(soup.title)\n"
+      ],
+      "metadata": {
+        "id": "0Aoh6Wipve8i"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "soup.title.string"
+      ],
+      "metadata": {
+        "id": "1FYgoePZvjkw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "soup.a\n",
+        "soup.find_all('a')\n",
+        "all_table=soup.find_all('table')"
+      ],
+      "metadata": {
+        "id": "9xm0UdWAvnhA"
+      },
+      "execution_count": 11,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import requests\n",
+        "from bs4 import BeautifulSoup\n",
+        "import pandas as pd\n",
+        "\n",
+        "def extract_table_data(url):\n",
+        "    try:\n",
+        "        # Send a GET request to the URL\n",
+        "        response = requests.get(url)\n",
+        "\n",
+        "        # Check if the request was successful\n",
+        "        response.raise_for_status()\n",
+        "\n",
+        "        # Parse the HTML content of the webpage\n",
+        "        soup = BeautifulSoup(response.text, 'html.parser')\n",
+        "\n",
+        "        # Find the table element\n",
+        "        table = soup.find('table')\n",
+        "\n",
+        "        # Extract table data into a list of lists\n",
+        "        table_data = []\n",
+        "        if table:\n",
+        "            rows = table.find_all('tr')\n",
+        "            for row in rows:\n",
+        "                # Extract cell data from each row\n",
+        "                cell_data = [cell.text.strip() for cell in row.find_all(['th', 'td'])]\n",
+        "                table_data.append(cell_data)\n",
+        "\n",
+        "            return table_data\n",
+        "        else:\n",
+        "            print(\"Table not found on the webpage.\")\n",
+        "            return None\n",
+        "    except requests.RequestException as e:\n",
+        "        print(\"Error fetching URL:\", e)\n",
+        "        return None\n",
+        "\n",
+        "# Example usage\n",
+        "url = 'https://www.jagranjosh.com/general-knowledge/list-of-most-powerful-military-in-the-world-1705477042-1'\n",
+        "table_data = extract_table_data(url)\n",
+        "if table_data:\n",
+        "    # Convert table data to a DataFrame\n",
+        "    df = pd.DataFrame(table_data[1:], columns=table_data[0])\n",
+        "    print(\"Table Data:\")\n",
+        "    print(df)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8Wp9UqmcvuGI",
+        "outputId": "44ca50e5-2aeb-4030-da38-6035d448a076"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Table Data:\n",
+            "  Rank   Rank & Nation Power Index Total Military Personnel (est)\n",
+            "0    1   United States      0.0699                      2,127,500\n",
+            "1    2          Russia      0.0702                      3,570,000\n",
+            "2    3           China      0.0706                      3,170,000\n",
+            "3    4           India      0.1023                      5,137,550\n",
+            "4    5     South Korea      0.1416                      3,820,000\n",
+            "5    6  United Kingdom      0.1443                      1,108,860\n",
+            "6    7           Japan      0.1601                        328,150\n",
+            "7    8          Turkey      0.1697                        883,900\n",
+            "8    9        Pakistan      0.1711                      1,704,000\n",
+            "9   10           Italy      0.1863                        289,000\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
